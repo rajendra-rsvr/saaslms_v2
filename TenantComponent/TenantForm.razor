@@ -1,0 +1,97 @@
+﻿@page "/tenantform/{id:int?}"
+@using Microsoft.AspNetCore.Components.Forms
+@using SAASLMS.Model
+@using SAASLMS.Services
+@inject TenantService TenantService
+@inject NavigationManager NavigationManager
+@layout PublicLayout
+<div class="form-container">
+    <div class="form-card">
+        <h3>@(Tenant.Id == 0 ? "Register Tenant" : "Edit Tenant")</h3>
+        <EditForm Model="@Tenant" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="form-group">
+                <label for="TenantName">Tenant Name:</label>
+                <InputText @bind-Value="Tenant.TenantName" class="form-input" id="TenantName" />
+            </div>
+            <div class="form-group">
+                <label for="FirstName">First Name:</label>
+                <InputText @bind-Value="Tenant.FirstName" class="form-input" id="FirstName" />
+            </div>
+            <div class="form-group">
+                <label for="LastName">Last Name:</label>
+                <InputText @bind-Value="Tenant.LastName" class="form-input" id="LastName" />
+            </div>
+            <div class="form-group">
+                <label for="Email">Email:</label>
+                <InputText @bind-Value="Tenant.Email" class="form-input" id="Email" />
+            </div>
+            <div class="form-group">
+                <label for="Domain">Domain:</label>
+                <InputText @bind-Value="Tenant.Domain" class="form-input" id="Domain" />
+            </div>
+            <div class="form-group">
+                <label for="Status">Status:</label>
+                <InputSelect @bind-Value="Tenant.StatusId" class="form-input" id="Status">
+                    <option value="">--Select Status--</option>
+                    @foreach (var status in Statuses)
+                    {
+                        <option value="@status.Id">@status.StatusName</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="form-group">
+                <label for="SubscriptionPlan">Subscription Plan:</label>
+                <InputSelect @bind-Value="Tenant.SubscriptionPlanId" class="form-input" id="SubscriptionPlan">
+                    <option value="">-- Select Plan --</option>
+                    @foreach (var plan in SubscriptionPlans)
+                    {
+                        <option value="@plan.Id">@plan.Plan</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn">@((Tenant.Id == 0) ? "Register" : "Update")</button>
+            </div>
+        </EditForm>
+
+        <div class="info">
+            <p>Complete the form to create or update tenant details, assign a subscription plan, and manage tenant access.</p>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public int? Id { get; set; }
+    private Tenant Tenant { get; set; } = new Tenant();
+
+    private List<SubscriptionPlan> SubscriptionPlans { get; set; } = new List<SubscriptionPlan>();
+    private List<Status> Statuses { get; set; } = new List<Status>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id.HasValue)
+        {
+            Tenant = await TenantService.GetTenantByIdAsync(Id.Value) ?? new Tenant();
+        }
+
+        SubscriptionPlans = await TenantService.GetSubscriptionPlansAsync();
+        Statuses = await TenantService.GetStatusAsync();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (Tenant.Id == 0)
+        {
+            await TenantService.CreateTenantAsync(Tenant);
+        }
+        else
+        {
+            await TenantService.UpdateTenantAsync(Tenant);
+        }
+
+        NavigationManager.NavigateTo("/tenants");
+    }
+}

@@ -1,0 +1,36 @@
+﻿@using SAASLMS.Services
+@inherits LayoutComponentBase
+@inject AuthenticationService AuthService
+@inject NavigationManager NavigationManager
+
+<PageTitle>SAASLMS</PageTitle>
+
+<div class="page">
+    @if (AuthService.IsAuthenticated)
+    {
+        <div class="sidebar">
+            <NavMenu />
+        </div>
+    }
+
+    <main>
+       @*  <div class="top-row px-4">
+            @if (AuthService.IsAuthenticated)
+            {
+                <button @onclick="HandleLogout" class="btn btn-link">Logout</button>
+            }
+        </div> *@
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+@code {
+    private void HandleLogout()
+    {
+        AuthService.LogoutAsync();
+        NavigationManager.NavigateTo("/");
+    }
+}

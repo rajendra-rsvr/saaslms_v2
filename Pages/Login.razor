@@ -1,0 +1,65 @@
+﻿@layout PublicLayout
+@page "/login"
+@using SAASLMS.Services
+@using SAASLMS.Shared
+@inject AuthenticationService AuthService
+@inject NavigationManager NavigationManager
+
+<div class="login-container">
+    <div class="login-card">
+        <h3>Login</h3>
+        <form @onsubmit="HandleLogin">
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" @bind="Email" placeholder="Enter your email" required />
+            </div>
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" @bind="Password" placeholder="Enter your password" required />
+            </div>
+            <button type="submit" class="btn">Login</button>
+        </form>
+        <div class="info">
+            <p>Welcome to our Learning Management System! Please login to access your courses and resources.</p>
+        </div>
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="error-message">@ErrorMessage</div>
+        }
+    </div>
+</div>
+
+@code {
+    private string Email { get; set; } = string.Empty;
+    private string Password { get; set; } = string.Empty;
+    private string? ErrorMessage { get; set; }
+
+    private async Task HandleLogin()
+    {
+        try
+        {
+            var user = await AuthService.AuthenticateUserAsync(Email, Password);
+            if (user != null)
+            {
+                // Complete login process
+                await AuthService.LoginAsync(user.Email, user.RoleId.ToString());
+
+                // Redirect after successful login
+                NavigationManager.NavigateTo("/tenants");
+            }
+            else
+            {
+                ErrorMessage = "Invalid email or password. Please try again.";
+            }
+        }
+        catch (InvalidOperationException ex)
+        {
+            // Catch and display errors related to response headers
+            ErrorMessage = ex.Message;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"An unexpected error occurred: {ex.Message}";
+        }
+    }
+}

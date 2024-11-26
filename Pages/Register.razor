@@ -1,0 +1,36 @@
+﻿@layout PublicLayout
+@page "/register"
+@using SAASLMS.Services
+@using SAASLMS.Shared
+@inject AuthenticationService AuthService
+@inject NavigationManager NavigationManager
+
+<h3>Register</h3>
+
+<form @onsubmit="HandleRegister">
+    <div>
+        <label>Full Name:</label>
+        <input type="text" @bind="FullName" placeholder="Enter your full name" required />
+    </div>
+    <div>
+        <label>Email:</label>
+        <input type="email" @bind="Email" placeholder="Enter your email" required />
+    </div>
+    <div>
+        <label>Password:</label>
+        <input type="password" @bind="Password" placeholder="Create a password" required />
+    </div>
+    <button type="submit">Register</button>
+</form>
+
+@code {
+    private string FullName { get; set; }
+    private string Email { get; set; }
+    private string Password { get; set; }
+
+    private void HandleRegister()
+    {
+        // Add registration logic here
+        Console.WriteLine($"Registering user: {FullName}");
+    }
+}

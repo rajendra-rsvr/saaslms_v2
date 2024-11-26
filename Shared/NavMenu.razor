@@ -1,0 +1,77 @@
+﻿@using SAASLMS.Services
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">SAASLMS</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Dropdown Menu for Login/Register -->
+        <div class="dropdown me-3">
+            <button class="btn btn-secondary dropdown-toggle"
+                    type="button"
+                    id="authMenu"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                Menu
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="authMenu">
+                @if (!IsAuthenticated)
+                {
+                    <li>
+                        <NavLink class="dropdown-item" href="/login">Login</NavLink>
+                    </li>
+                    <li>
+                        <NavLink class="dropdown-item" href="/register">Register</NavLink>
+                    </li>
+                }
+                else
+                {
+                    <li>
+                        <NavLink class="dropdown-item" href="/profile">Profile</NavLink>
+                    </li>
+                    <li>
+                        <button class="dropdown-item" @onclick="Logout">Logout</button>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass nav-scrollable">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="tenants" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Tenants
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="tenantform">
+                <span class="oi oi-plus" aria-hidden="true"></span> Create Tenant
+            </NavLink>
+        </div>
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private bool IsAuthenticated => AuthService.IsAuthenticated;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+    private void Logout()
+    {
+        AuthService.LogoutAsync();
+        NavigationManager.NavigateTo("/");
+    }
+
+    [Inject] private AuthenticationService AuthService { get; set; }
+    [Inject] private NavigationManager NavigationManager { get; set; }
+}

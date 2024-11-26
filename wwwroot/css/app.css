@@ -1,0 +1,23 @@
+.form-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+    .form-table td {
+        padding: 8px;
+        vertical-align: top;
+    }
+
+    .form-table label {
+        display: inline-block;
+        width: 120px; /* Fixed width for labels */
+        font-weight: bold;
+    }
+
+    .form-table input[type="text"],
+    .form-table input[type="number"] {
+        width: 250px; /* Fixed width for input boxes */
+        padding: 6px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }

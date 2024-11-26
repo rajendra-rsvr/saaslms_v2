@@ -1,0 +1,71 @@
+﻿@page "/tenants"
+@using SAASLMS.Model
+@using SAASLMS.Services
+@inject TenantService TenantService
+@inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+
+<h3>Tenants</h3>
+
+@if (tenants == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Tenant</th>
+                <th>First</th>
+                <th>Last</th>
+                <th>Email</th>
+                <th>Domain</th>
+                <th>Status</th>
+                <th>Create</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var tenant in tenants)
+            {
+                <tr>
+                    <td>@tenant.Id</td>
+                    <td>@tenant.TenantName</td>
+                    <td>@tenant.FirstName</td>
+                    <td>@tenant.LastName</td>
+                    <td>@tenant.Email</td>
+                    <td>@tenant.Domain</td>
+                    <td>@tenant.StatusId</td>
+                    <td>@tenant.CreateDate.ToShortDateString()</td>
+                    <td>
+                        <button @onclick="() => EditTenant(tenant.Id)">Edit</button>
+                        <button @onclick="() => DeleteTenant(tenant.Id)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Tenant> tenants;
+
+    protected override async Task OnInitializedAsync()
+    {
+        tenants = await TenantService.GetAllTenantsAsync();
+    }
+
+    private void EditTenant(int id)
+    {
+        NavigationManager.NavigateTo($"/tenantform/{id}");
+    }
+
+    private async Task DeleteTenant(int id)
+    {
+        await TenantService.DeleteTenantAsync(id);
+        tenants = await TenantService.GetAllTenantsAsync(); // Refresh list
+    }
+}
